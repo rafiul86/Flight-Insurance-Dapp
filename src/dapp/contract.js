@@ -3,13 +3,13 @@ import Config from './config.json';
 import Web3 from 'web3';
 
 export default class Contract {
-    constructor(network, callback) {
+    constructor(network, callback) {  
 
         let config = Config[network];
-        this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
+        this.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
         this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
         this.initialize(callback);
-        this.owner = null;
+        this.owner = null; 
         this.airlines = [];
         this.passengers = [];
     }
@@ -17,7 +17,7 @@ export default class Contract {
     initialize(callback) {
         this.web3.eth.getAccounts((error, accts) => {
            
-            this.owner = accts[0];
+            this.owner =  accts[0];
 
             let counter = 1;
             
