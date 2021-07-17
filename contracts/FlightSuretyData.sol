@@ -131,27 +131,28 @@ contract FlightSuretyData {
         require(!airlines[account].isRegistered, "Airline is already registered.");
         require(airlines[account].isAdmin, "Caller is not an admin");
 
-        if (airlines.length =< 4){
+        if (airlines.length =< 4 && amount >= adminCharge ){
 
-            bool makeAdmin = false;
             require(amount >= balance[account]  , 'Insufficient Balance')
-            require(amount >= adminCharge , 'Insufficient Balance to become admin')
             uint256 deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
-            makeAdmin = true;
-
-             if(makeAdmin == true){
-                 airlines[account] = AirlineProfile({
+            airlines[account] = AirlineProfile({
                                                 isRegistered: true,
                                                 isAdmin: true
                                             });
-             } else {
-                 airlines[account] = AirlineProfile({
+        
+        } 
+        else if (airlines.length =< 4 && amount < adminCharge){
+
+            airlines[account] = AirlineProfile({
                                                 isRegistered: true,
                                                 isAdmin: false
                                             });
-             }
-        } else {
+        
+        }
+        
+        else if (airlines.length =< 4 && amount >= adminCharge ) {
+            
             bool isDuplicate = false;
         for(uint i=0; i<multiCalls.length; i++) {
             if (multiCalls[i] == msg.sender) {
@@ -162,32 +163,42 @@ contract FlightSuretyData {
         require(!isDuplicate, "Caller has already called this function.");
 
         multiCalls.push(msg.sender);
-        
+
         if (multiCalls.length >= M) {
-            bool makeAdmin = false;
-            require(amount >= balance[airline]  , 'Insufficient Balance')
-            require(amount >= adminCharge , 'Insufficient Balance to become admin')
+            require(amount >= balance[account]  , 'Insufficient Balance')
             uint256 deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
-            makeAdmin = true;
 
-            if(makeAdmin == true){
-                 airlines[account] = AirlineProfile({
+            airlines[account] = AirlineProfile({
                                                 isRegistered: true,
                                                 isAdmin: true
                                             });
-                   multiCalls = new address[](0);  
+             multiCalls = new address[](0);
+                 }
+             }  
 
-             } else {
-                 airlines[account] = AirlineProfile({
+         else {
+                 bool isDuplicate = false;
+        for(uint i=0; i<multiCalls.length; i++) {
+            if (multiCalls[i] == msg.sender) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        require(!isDuplicate, "Caller has already called this function.");
+
+        multiCalls.push(msg.sender);
+        if (multiCalls.length >= M) {
+           
+             airlines[account] = AirlineProfile({
                                                 isRegistered: true,
                                                 isAdmin: false
                                             });
-                          multiCalls = new address[](0);  
-             }    
-             }
-        }
-        
+            multiCalls = new address[](0);
+
+             }  
+
+         }        
     }
 
 
@@ -197,7 +208,7 @@ contract FlightSuretyData {
     */   
     function buy
                             (                             
-                            )
+                            ) 
                             external
                             payable
     {
