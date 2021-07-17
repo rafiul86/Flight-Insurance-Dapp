@@ -109,7 +109,8 @@ contract FlightSuretyApp {
     *
     */   
     function registerAirline
-                            (   address account,
+                            (  
+                                 address account,
                             )
                             external
                             pure
@@ -129,14 +130,14 @@ contract FlightSuretyApp {
     */  
     function registerFlight
                                 (
-                                  bytes32 index,string flight, bool registerStatus, uint8 statusCode,uint256 timestamp, address airline
+                                  bytes32 index,string memory flight, uint256 timestamp, address airline
                                 )
                                 external
                             
     {
         bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
 
-        flights[key] = Flight(isRegistered: registerStatus, statusCode: statusCode,updatedTimestamp: timestamp, airline: msg.sender)
+        flights[key] = Flight(isRegistered: true, statusCode: 10, updatedTimestamp: timestamp, airline: msg.sender)
     }
     
    /**
@@ -145,6 +146,7 @@ contract FlightSuretyApp {
     */  
     function processFlightStatus
                                 (
+                                    bytes32 index
                                     address airline,
                                     string memory flight,
                                     uint256 timestamp,
@@ -153,6 +155,8 @@ contract FlightSuretyApp {
                                 internal
                                 
     {
+        bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
+        flights[key].statusCode = statusCode;
     }
 
 

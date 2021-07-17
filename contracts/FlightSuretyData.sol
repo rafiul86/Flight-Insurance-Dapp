@@ -164,7 +164,7 @@ contract FlightSuretyData {
         multiCalls.push(msg.sender);
 
         if (multiCalls.length >= M) {
-            
+
             require( amount >= adminCharge , 'Insufficient Balance')
             require( balance[account] >=  amount , 'Insufficient Balance')
             uint256 deductAmount = balance[account].sub(amount);
@@ -182,7 +182,8 @@ contract FlightSuretyData {
     *
     */   
     function buy
-                            ( uint256 amount, bytes32 flight                            
+                            ( 
+                                uint256 amount, bytes32 flight                            
                             ) 
                             external
                             payable
