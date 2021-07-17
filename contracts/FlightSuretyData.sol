@@ -12,7 +12,7 @@ contract FlightSuretyData {
 
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;                                 // Blocks all state changes throughout the contract if false
-    uint M = (airlines.length).div(2);
+    uint constant M = 4;
     address[] multiCalls = new address[](0); 
     uint256 adminCharge = 10 ether;
     uint256 insurancePrice = 1 ether;
@@ -50,7 +50,6 @@ contract FlightSuretyData {
                                 public 
     {
         contractOwner = msg.sender;
-        registerAirline(msg.sender, true);
     }
 
     /********************************************************************************************/
@@ -158,12 +157,12 @@ contract FlightSuretyData {
     {
         require(airlines[account].isRegistered, "Airline must be registered.");
         require(airlines[msg.sender].isAdmin, "Caller is not an admin");
-
-        if (airlines.length <= 4 ){
+            uint256 deductAmount;
+        if (M <= 4 ){
 
             require( amount >= adminCharge , 'Insufficient Balance');
             require( balance[account] >=  amount , 'Insufficient Balance');
-            uint256 deductAmount = balance[account].sub(amount);
+            deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
             airlines[account].isAdmin = true;
         
@@ -184,7 +183,7 @@ contract FlightSuretyData {
 
             require( amount >= adminCharge , 'Insufficient Balance');
             require( balance[account] >=  amount , 'Insufficient Balance');
-            uint256 deductAmount = balance[account].sub(amount);
+            deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
             airlines[account].isAdmin = true;
 
@@ -228,8 +227,8 @@ contract FlightSuretyData {
                             
     {
         require( cancelledFlight ==  passengers[account].flight , "Flight is ok");
-         uint256 insuranceReturn =   insurancePrice.mul(1.5);  
-                 balance[account].transfer(insuranceReturn);
+         uint256 insuranceReturn =   insurancePrice.mul(2);  
+                 balance[account].add(insuranceReturn);
     }
     
 
@@ -259,15 +258,12 @@ contract FlightSuretyData {
     */   
     function fund
                             ( 
-                                uint256 amount  
+                                 
                             )
                             public
                             payable
     {
-        require(msg.value >= amount, 'Amount must be less than available balance');
-        uint256 fundAmount = msg.value.sub(amount);
-                msg.value.sub(msg.value.sub(amount));
-                contractOwner.transfer(fundAmount);
+        
     }
 
     function getFlightKey
@@ -277,6 +273,7 @@ contract FlightSuretyData {
                             uint256 timestamp
                         )
                         internal
+                        pure
                         returns(bytes32) 
     {
         return keccak256(abi.encodePacked(airline, flight, timestamp));
@@ -286,7 +283,7 @@ contract FlightSuretyData {
     * @dev Fallback function for funding smart contract.
     *
     */
-    fallback() 
+    function() 
                             external 
                             payable 
     {

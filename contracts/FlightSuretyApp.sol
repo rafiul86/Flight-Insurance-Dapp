@@ -17,7 +17,7 @@ contract FlightSuretyApp {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
-    FlightSuretyData flightSuretyData;
+    
     
     // Flight status codees
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
@@ -84,12 +84,11 @@ contract FlightSuretyApp {
     */
     constructor
                                 (
-                                    address dataContract
+                                    
                                 ) 
                                 public 
     {
         contractOwner = msg.sender;
-        flightSuretyData = FlightSuretyData(dataContract);
     }
 
     /********************************************************************************************/
@@ -120,6 +119,7 @@ contract FlightSuretyApp {
                             external
                             returns(bool success, uint256 votes)
     {
+        require(airlines[msg.sender].isAdmin, "Caller is not admin");
         airlines[account] = AirlineProfile({
                                                 isRegistered: true,
                                                 isAdmin: false
@@ -134,11 +134,12 @@ contract FlightSuretyApp {
     */  
     function registerFlight
                                 (
-                                  string memory flight, uint256 timestamp, address airline
+                                  string flight, uint256 timestamp, address airline
                                 )
                                 external
                             
     {
+        require(airlines[msg.sender].isAdmin, "Caller is not admin");
         bytes32 key = getFlightKey(airline, flight, timestamp);
 
         flights[key] = Flight({isRegistered: true, statusCode: 10, updatedTimestamp: timestamp, airline: msg.sender});
@@ -157,8 +158,11 @@ contract FlightSuretyApp {
                                 )
                                 internal
                                 
-    {
+    {   
+        
+        require(airlines[msg.sender].isAdmin, "Caller is not admin");
         bytes32 key = getFlightKey(airline, flight, timestamp);
+        require(flights[key].airline == msg.sender, "Caller is not admin");
         flights[key].statusCode = statusCode;
     }
 
