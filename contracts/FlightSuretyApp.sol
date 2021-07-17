@@ -1,4 +1,5 @@
-pragma solidity ^0.4.24;
+//SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.4.24;
 
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
@@ -110,16 +111,15 @@ contract FlightSuretyApp {
     */   
     function registerAirline
                             (  
-                                 address account,
+                                 address account
                             )
                             external
-                            pure
                             returns(bool success, uint256 votes)
     {
         airlines[account] = AirlineProfile({
                                                 isRegistered: true,
                                                 isAdmin: false
-                                             })
+                                             });
         return (success, 0);
     }
 
@@ -137,7 +137,7 @@ contract FlightSuretyApp {
     {
         bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
 
-        flights[key] = Flight(isRegistered: true, statusCode: 10, updatedTimestamp: timestamp, airline: msg.sender)
+        flights[key] = Flight({isRegistered: true, statusCode: 10, updatedTimestamp: timestamp, airline: msg.sender});
     }
     
    /**
@@ -146,7 +146,7 @@ contract FlightSuretyApp {
     */  
     function processFlightStatus
                                 (
-                                    bytes32 index
+                                    bytes32 index,
                                     address airline,
                                     string memory flight,
                                     uint256 timestamp,

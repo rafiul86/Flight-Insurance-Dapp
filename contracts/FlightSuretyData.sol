@@ -1,4 +1,5 @@
-pragma solidity ^0.4.24;
+//SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.4.24;
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -10,12 +11,14 @@ contract FlightSuretyData {
     /********************************************************************************************/
 
     address private contractOwner;                                      // Account used to deploy contract
-    bool private operational = true;  
-    uint256 passengerCount = 0;                                  // Blocks all state changes throughout the contract if false
+    bool private operational = true;                                 // Blocks all state changes throughout the contract if false
     uint M = (airlines.length).div(2);
     address[] multiCalls = new address[](0); 
     uint256 adminCharge = 10 ether;
     uint256 insurancePrice = 1 ether;
+    uint256 private counter = 1;
+    uint256 private enabled = block.timestamp;
+
 
     struct AirlineProfile{
        bool isRegistered;
@@ -27,10 +30,9 @@ contract FlightSuretyData {
 
 
     struct PassengerProfile {
-        uint256 index;
         bytes32 flight;
     }
-    mapping(bytes32 => PassengerProfile) passengers;
+    mapping(address => PassengerProfile) passengers;
 
 
     /********************************************************************************************/
@@ -76,6 +78,21 @@ contract FlightSuretyData {
     {
         require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
+    }
+
+    modifier requireRateLimit(uint time){
+        
+        require(block.timestamp >= enabled ,"Rate limiting in effects");
+        _;
+        enabled = enabled.add(time);
+    }
+
+    modifier requireGuard(){
+        counter = counter.add(1);
+        uint256 guard = counter;
+        _;
+
+        require(guard == counter, "This withdraw is not possible");
     }
 
     /********************************************************************************************/
@@ -142,10 +159,10 @@ contract FlightSuretyData {
         require(airlines[account].isRegistered, "Airline must be registered.");
         require(airlines[msg.sender].isAdmin, "Caller is not an admin");
 
-        if (airlines.length =< 4 ){
+        if (airlines.length <= 4 ){
 
-            require( amount >= adminCharge , 'Insufficient Balance')
-            require( balance[account] >=  amount , 'Insufficient Balance')
+            require( amount >= adminCharge , 'Insufficient Balance');
+            require( balance[account] >=  amount , 'Insufficient Balance');
             uint256 deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
             airlines[account].isAdmin = true;
@@ -165,8 +182,8 @@ contract FlightSuretyData {
 
         if (multiCalls.length >= M) {
 
-            require( amount >= adminCharge , 'Insufficient Balance')
-            require( balance[account] >=  amount , 'Insufficient Balance')
+            require( amount >= adminCharge , 'Insufficient Balance');
+            require( balance[account] >=  amount , 'Insufficient Balance');
             uint256 deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
             airlines[account].isAdmin = true;
@@ -192,12 +209,10 @@ contract FlightSuretyData {
         require(amount >= insurancePrice, 'Insufficient fund to but insurance');
         require(balance[msg.sender] >= amount, 'Insufficient fund to but insurance');
         uint256 deductionAmount = balance[msg.sender].sub(amount);
-        contractOwner.transfer(deductionAmount)
-        passengers[passengerCount] = PassengerProfile({
-                                                index: passengerCount,
+        contractOwner.transfer(deductionAmount);
+        passengers[msg.sender] = PassengerProfile({
                                                 flight: flight
-                                                        });
-                passengerCount++;
+                                                 });
 
     }
 
@@ -206,12 +221,15 @@ contract FlightSuretyData {
     */
     function creditInsurees
                                 (
+                                    bytes32 cancelledFlight,
+                                    address account
                                 )
                                 external
                             
     {
-        require( uint8 statusCode = 20 , "Flight is ok");
-
+        require( cancelledFlight ==  passengers[account].flight , "Flight is ok");
+         uint256 insuranceReturn =   insurancePrice.mul(1.5);  
+                 balance[account].transfer(insuranceReturn);
     }
     
 
@@ -221,10 +239,17 @@ contract FlightSuretyData {
     */
     function pay
                             (
+                                uint256 amount
                             )
                             external
+                            requireRateLimit(60 minutes) requireGuard
                             
     {
+            require(msg.sender == tx.origin, "Contracts are not allowed to withdraw funds");
+            require(balance[msg.sender] >= amount, 'Amount must be less than available balance');
+            uint256 withdrwableBalance = balance[msg.sender];
+                    balance[msg.sender].sub(withdrwableBalance);
+                    msg.sender.transfer(withdrwableBalance);
     }
 
    /**
@@ -233,11 +258,16 @@ contract FlightSuretyData {
     *
     */   
     function fund
-                            (   
+                            ( 
+                                uint256 amount  
                             )
                             public
                             payable
     {
+        require(msg.value >= amount, 'Amount must be less than available balance');
+        uint256 fundAmount = msg.value.sub(amount);
+                msg.value.sub(msg.value.sub(amount));
+                contractOwner.transfer(fundAmount);
     }
 
     function getFlightKey
@@ -257,7 +287,7 @@ contract FlightSuretyData {
     * @dev Fallback function for funding smart contract.
     *
     */
-    function() 
+    fallback() 
                             external 
                             payable 
     {
