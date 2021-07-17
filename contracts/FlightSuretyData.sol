@@ -167,7 +167,7 @@ contract FlightSuretyData {
             contractOwner.transfer(deductAmount);
             airlines[account].isAdmin = true;
         
-        } else  {
+        } else {
             
             bool isDuplicate = false;
         for(uint i=0; i<multiCalls.length; i++) {
@@ -276,7 +276,6 @@ contract FlightSuretyData {
                             string memory flight,
                             uint256 timestamp
                         )
-                        pure
                         internal
                         returns(bytes32) 
     {

@@ -17,6 +17,8 @@ contract FlightSuretyApp {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
+    FlightSuretyData flightSuretyData;
+    
     // Flight status codees
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
@@ -82,10 +84,12 @@ contract FlightSuretyApp {
     */
     constructor
                                 (
+                                    address dataContract
                                 ) 
                                 public 
     {
         contractOwner = msg.sender;
+        flightSuretyData = FlightSuretyData(dataContract);
     }
 
     /********************************************************************************************/
@@ -130,12 +134,12 @@ contract FlightSuretyApp {
     */  
     function registerFlight
                                 (
-                                  bytes32 index,string memory flight, uint256 timestamp, address airline
+                                  string memory flight, uint256 timestamp, address airline
                                 )
                                 external
                             
     {
-        bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
+        bytes32 key = getFlightKey(airline, flight, timestamp);
 
         flights[key] = Flight({isRegistered: true, statusCode: 10, updatedTimestamp: timestamp, airline: msg.sender});
     }
@@ -146,7 +150,6 @@ contract FlightSuretyApp {
     */  
     function processFlightStatus
                                 (
-                                    bytes32 index,
                                     address airline,
                                     string memory flight,
                                     uint256 timestamp,
@@ -155,7 +158,7 @@ contract FlightSuretyApp {
                                 internal
                                 
     {
-        bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
+        bytes32 key = getFlightKey(airline, flight, timestamp);
         flights[key].statusCode = statusCode;
     }
 
@@ -353,4 +356,6 @@ contract FlightSuretyApp {
 
 // endregion
 
-}   
+}  
+
+
