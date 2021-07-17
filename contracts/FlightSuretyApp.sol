@@ -26,6 +26,14 @@ contract FlightSuretyApp {
 
     address private contractOwner;          // Account used to deploy contract
 
+
+    struct AirlineProfile{
+       bool isRegistered;
+       bool isAdmin;
+    }
+
+    mapping(address => AirlineProfile) airlines;
+
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
@@ -101,12 +109,16 @@ contract FlightSuretyApp {
     *
     */   
     function registerAirline
-                            (   
+                            (   address account,
                             )
                             external
                             pure
                             returns(bool success, uint256 votes)
     {
+        airlines[account] = AirlineProfile({
+                                                isRegistered: true,
+                                                isAdmin: false
+                                             })
         return (success, 0);
     }
 

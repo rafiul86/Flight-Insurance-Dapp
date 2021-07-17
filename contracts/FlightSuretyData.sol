@@ -10,10 +10,13 @@ contract FlightSuretyData {
     /********************************************************************************************/
 
     address private contractOwner;                                      // Account used to deploy contract
-    bool private operational = true;                                    // Blocks all state changes throughout the contract if false
+    bool private operational = true;  
+    uint256 passengerCount = 0;                                  // Blocks all state changes throughout the contract if false
     uint M = (airlines.length).div(2);
     address[] multiCalls = new address[](0); 
     uint256 adminCharge = 10 ether;
+    uint256 insurancePrice = 1 ether;
+
     struct AirlineProfile{
        bool isRegistered;
        bool isAdmin;
@@ -21,6 +24,14 @@ contract FlightSuretyData {
 
     mapping(address => AirlineProfile) airlines;
     mapping(address => uint256) balance;
+
+
+    struct PassengerProfile {
+        uint256 index;
+        bytes32 flight;
+    }
+    mapping(bytes32 => PassengerProfile) passengers;
+
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -107,7 +118,7 @@ contract FlightSuretyData {
         multiCalls.push(msg.sender);
         if (multiCalls.length >= M) {
             operational = mode;      
-            multiCalls = new address[](0);      
+            multiCalls = new address[](0);
         }
 
     }
@@ -128,30 +139,18 @@ contract FlightSuretyData {
                             external
                             
     {
-        require(!airlines[account].isRegistered, "Airline is already registered.");
-        require(airlines[account].isAdmin, "Caller is not an admin");
+        require(airlines[account].isRegistered, "Airline must be registered.");
+        require(airlines[msg.sender].isAdmin, "Caller is not an admin");
 
-        if (airlines.length =< 4 && amount >= adminCharge ){
+        if (airlines.length =< 4 ){
 
-            require(amount >= balance[account]  , 'Insufficient Balance')
+            require( amount >= adminCharge , 'Insufficient Balance')
+            require( balance[account] >=  amount , 'Insufficient Balance')
             uint256 deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
-            airlines[account] = AirlineProfile({
-                                                isRegistered: true,
-                                                isAdmin: true
-                                            });
+            airlines[account].isAdmin = true;
         
-        } 
-        else if (airlines.length =< 4 && amount < adminCharge){
-
-            airlines[account] = AirlineProfile({
-                                                isRegistered: true,
-                                                isAdmin: false
-                                            });
-        
-        }
-        
-        else if (airlines.length =< 4 && amount >= adminCharge ) {
+        } else  {
             
             bool isDuplicate = false;
         for(uint i=0; i<multiCalls.length; i++) {
@@ -165,40 +164,16 @@ contract FlightSuretyData {
         multiCalls.push(msg.sender);
 
         if (multiCalls.length >= M) {
-            require(amount >= balance[account]  , 'Insufficient Balance')
+            
+            require( amount >= adminCharge , 'Insufficient Balance')
+            require( balance[account] >=  amount , 'Insufficient Balance')
             uint256 deductAmount = balance[account].sub(amount);
             contractOwner.transfer(deductAmount);
+            airlines[account].isAdmin = true;
 
-            airlines[account] = AirlineProfile({
-                                                isRegistered: true,
-                                                isAdmin: true
-                                            });
              multiCalls = new address[](0);
                  }
-             }  
-
-         else {
-                 bool isDuplicate = false;
-        for(uint i=0; i<multiCalls.length; i++) {
-            if (multiCalls[i] == msg.sender) {
-                isDuplicate = true;
-                break;
-            }
-        }
-        require(!isDuplicate, "Caller has already called this function.");
-
-        multiCalls.push(msg.sender);
-        if (multiCalls.length >= M) {
-           
-             airlines[account] = AirlineProfile({
-                                                isRegistered: true,
-                                                isAdmin: false
-                                            });
-            multiCalls = new address[](0);
-
-             }  
-
-         }        
+             }        
     }
 
 
@@ -207,11 +182,21 @@ contract FlightSuretyData {
     *
     */   
     function buy
-                            (                             
+                            ( uint256 amount, bytes32 flight                            
                             ) 
                             external
                             payable
+                            
     {
+        require(amount >= insurancePrice, 'Insufficient fund to but insurance');
+        require(balance[msg.sender] >= amount, 'Insufficient fund to but insurance');
+        uint256 deductionAmount = balance[msg.sender].sub(amount);
+        contractOwner.transfer(deductionAmount)
+        passengers[passengerCount] = PassengerProfile({
+                                                index: passengerCount,
+                                                flight: flight
+                                                        });
+                passengerCount++;
 
     }
 
@@ -224,6 +209,8 @@ contract FlightSuretyData {
                                 external
                             
     {
+        require( uint8 statusCode = 20 , "Flight is ok");
+
     }
     
 
