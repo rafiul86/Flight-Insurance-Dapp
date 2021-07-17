@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
@@ -9,7 +9,7 @@ import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 /************************************************** */
 /* FlightSurety Smart Contract                      */
 /************************************************** */
-contract FlightSuretyApp {
+contract FlightSuretyApp { 
     using SafeMath for uint256; // Allow SafeMath functions to be called for all uint256 types (similar to "prototype" in Javascript)
 
     /********************************************************************************************/
@@ -117,11 +117,14 @@ contract FlightSuretyApp {
     */  
     function registerFlight
                                 (
+                                  bytes32 index,string flight, bool registerStatus, uint8 statusCode,uint256 timestamp, address airline
                                 )
                                 external
-                                pure
+                            
     {
+        bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
 
+        flights[key] = Flight(isRegistered: registerStatus, statusCode: statusCode,updatedTimestamp: timestamp, airline: msg.sender)
     }
     
    /**
@@ -136,7 +139,7 @@ contract FlightSuretyApp {
                                     uint8 statusCode
                                 )
                                 internal
-                                pure
+                                
     {
     }
 

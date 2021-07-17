@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -11,6 +11,15 @@ contract FlightSuretyData {
 
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;                                    // Blocks all state changes throughout the contract if false
+    uint constant M = 3;
+    address[] multiCalls = new address[](0); 
+
+    struct AirlineProfile{
+       bool isRegistered;
+       bool isAdmin;
+    }
+
+    mapping(address => AirlineProfile) airlines;
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -27,6 +36,7 @@ contract FlightSuretyData {
                                 public 
     {
         contractOwner = msg.sender;
+        registerAirline(msg.sender, true);
     }
 
     /********************************************************************************************/
@@ -79,14 +89,26 @@ contract FlightSuretyData {
     *
     * When operational mode is disabled, all write transactions except for this one will fail
     */    
-    function setOperatingStatus
-                            (
-                                bool mode
-                            ) 
-                            external
-                            requireContractOwner 
-    {
-        operational = mode;
+    function setOperatingStatus(bool mode) external {
+        
+        require(mode != operational, "New mode must be different from existing mode");
+        require(airlines[msg.sender].isAdmin, "Caller is not an admin");
+
+        bool isDuplicate = false;
+        for(uint c=0; c<multiCalls.length; c++) {
+            if (multiCalls[c] == msg.sender) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        require(!isDuplicate, "Caller has already called this function.");
+
+        multiCalls.push(msg.sender);
+        if (multiCalls.length >= M) {
+            operational = mode;      
+            multiCalls = new address[](0);      
+        }
+
     }
 
     /********************************************************************************************/
@@ -99,11 +121,17 @@ contract FlightSuretyData {
     *
     */   
     function registerAirline
-                            (   
+                            (  address airline,
+                                bool isAdmin
                             )
                             external
-                            pure
+                            
     {
+        require(!airlines[account].isRegistered, "Airline is already registered.");
+         airlines[account] = AirlineProfile({
+                                                isRegistered: true,
+                                                isAdmin: isAdmin
+                                            });
     }
 
 
@@ -127,7 +155,7 @@ contract FlightSuretyData {
                                 (
                                 )
                                 external
-                                pure
+                            
     {
     }
     
@@ -140,7 +168,7 @@ contract FlightSuretyData {
                             (
                             )
                             external
-                            pure
+                            
     {
     }
 
