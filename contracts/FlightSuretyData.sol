@@ -11,15 +11,16 @@ contract FlightSuretyData {
 
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;                                    // Blocks all state changes throughout the contract if false
-    uint constant M = 3;
+    uint M = (airlines.length).div(2);
     address[] multiCalls = new address[](0); 
-
+    uint256 adminCharge = 10 ether;
     struct AirlineProfile{
        bool isRegistered;
        bool isAdmin;
     }
 
     mapping(address => AirlineProfile) airlines;
+    mapping(address => uint256) balance;
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -95,8 +96,8 @@ contract FlightSuretyData {
         require(airlines[msg.sender].isAdmin, "Caller is not an admin");
 
         bool isDuplicate = false;
-        for(uint c=0; c<multiCalls.length; c++) {
-            if (multiCalls[c] == msg.sender) {
+        for(uint i=0; i<multiCalls.length; i++) {
+            if (multiCalls[i] == msg.sender) {
                 isDuplicate = true;
                 break;
             }
@@ -121,17 +122,72 @@ contract FlightSuretyData {
     *
     */   
     function registerAirline
-                            (  address airline,
-                                bool isAdmin
+                            (  address account,
+                                uint256 amount
                             )
                             external
                             
     {
         require(!airlines[account].isRegistered, "Airline is already registered.");
-         airlines[account] = AirlineProfile({
+        require(airlines[account].isAdmin, "Caller is not an admin");
+
+        if (airlines.length =< 4){
+
+            bool makeAdmin = false;
+            require(amount >= balance[account]  , 'Insufficient Balance')
+            require(amount >= adminCharge , 'Insufficient Balance to become admin')
+            uint256 deductAmount = balance[account].sub(amount);
+            contractOwner.transfer(deductAmount);
+            makeAdmin = true;
+
+             if(makeAdmin == true){
+                 airlines[account] = AirlineProfile({
                                                 isRegistered: true,
-                                                isAdmin: isAdmin
+                                                isAdmin: true
                                             });
+             } else {
+                 airlines[account] = AirlineProfile({
+                                                isRegistered: true,
+                                                isAdmin: false
+                                            });
+             }
+        } else {
+            bool isDuplicate = false;
+        for(uint i=0; i<multiCalls.length; i++) {
+            if (multiCalls[i] == msg.sender) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        require(!isDuplicate, "Caller has already called this function.");
+
+        multiCalls.push(msg.sender);
+        
+        if (multiCalls.length >= M) {
+            bool makeAdmin = false;
+            require(amount >= balance[airline]  , 'Insufficient Balance')
+            require(amount >= adminCharge , 'Insufficient Balance to become admin')
+            uint256 deductAmount = balance[account].sub(amount);
+            contractOwner.transfer(deductAmount);
+            makeAdmin = true;
+
+            if(makeAdmin == true){
+                 airlines[account] = AirlineProfile({
+                                                isRegistered: true,
+                                                isAdmin: true
+                                            });
+                   multiCalls = new address[](0);  
+
+             } else {
+                 airlines[account] = AirlineProfile({
+                                                isRegistered: true,
+                                                isAdmin: false
+                                            });
+                          multiCalls = new address[](0);  
+             }    
+             }
+        }
+        
     }
 
 
