@@ -242,10 +242,12 @@ contract FlightSuretyData {
     {
         require(passengers[passenger].insuredFlight == cancelledFlight, "Flight status in not eligible for insurance payout");
         require(passengers[passenger].insuredFlight == cancelledFlight, "Flight status in not eligible for insurance payout");
+        require(!passengers[passenger].isActive, "insurance already payout");
         uint256 insuredPayout = insurancePrice.add(insurancePrice.div(2));
         uint256 contractBalance = address(this).balance;
         contractBalance = contractBalance.sub(insuredPayout);
         passengerInsuranceBalance[passenger].add(insuredPayout);
+        passengers[passenger].isActive = false;
     }
     
 
