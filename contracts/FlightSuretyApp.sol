@@ -364,10 +364,10 @@ contract FlightSuretyApp {
 
 contract FlightSuretyData{
     function registerAirline
-                            (  
+                            (
                                 address account
                             )
-                            external
+                            external;
 }
 
 
