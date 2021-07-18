@@ -200,7 +200,7 @@ contract FlightSuretyData {
         uint256 airlineWalletBalane = msg.value;
         uint256 fundAmount = msg.value.sub(amount);
         airlineWalletBalane = airlineWalletBalane.sub(fundAmount);
-        contractOwner.transfer(fundAmount);
+        address(this).transfer(fundAmount);
         airlines[msg.sender].isAdmin = true;
     }
 
@@ -222,7 +222,7 @@ contract FlightSuretyData {
         uint256 passengerWalletBalance = msg.value;
         uint256 deductionAmount = passengerWalletBalance.sub(amount);
         passengerWalletBalance = passengerWalletBalance.sub(deductionAmount);
-        contractOwner.transfer(deductionAmount);
+        address(this).transfer(deductionAmount);
         passengers[msg.sender] = PassengerInsuranceData({
                                       insuredFlight: flight,
                                            isActive: true
@@ -235,12 +235,17 @@ contract FlightSuretyData {
     */
     function creditInsurees
                                 (
-                                    bytes32 cancelledFlight
+                                    bytes32 cancelledFlight, address passenger
                                 )
                                 external
                             
     {
-    
+        require(passengers[passenger].insuredFlight == cancelledFlight, "Flight status in not eligible for insurance payout");
+        require(passengers[passenger].insuredFlight == cancelledFlight, "Flight status in not eligible for insurance payout");
+        uint256 insuredPayout = insurancePrice.add(insurancePrice.div(2));
+        uint256 contractBalance = address(this).balance;
+        contractBalance = contractBalance.sub(insuredPayout);
+        passengerInsuranceBalance[passenger].add(insuredPayout);
     }
     
 
@@ -258,6 +263,7 @@ contract FlightSuretyData {
     {
             require(msg.sender == tx.origin, "Contracts are not allowed to withdraw funds");
             require(passengerInsuranceBalance[msg.sender] >= amount, 'Amount must be less than available balance');
+            require(address(this).balance >= amount, "The contract doesn't have enough balance right now, please contract support team");
             uint256 withdrwableBalance = passengerInsuranceBalance[msg.sender];
                     passengerInsuranceBalance[msg.sender] = passengerInsuranceBalance[msg.sender].sub(withdrwableBalance);
                     msg.sender.transfer(withdrwableBalance);
