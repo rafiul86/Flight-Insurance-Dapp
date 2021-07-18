@@ -29,7 +29,7 @@ contract FlightSuretyData {
     }
 
     mapping(address => AirlineProfile) airlines;
-    
+    mapping(address => uint256) airlineBalance;
     
 
 
@@ -155,36 +155,20 @@ contract FlightSuretyData {
     */   
     function registerAirline
                             (  
-                                address account,
-                                uint256 amount
+                                address account
                             )
                             external
                             
     {
-        require(airlines[msg.sender].isRegistered, "Airline is not registered to register new airline.");
+        require(airlines[msg.sender].isAdmin, "Airline is not an admin to register new airline.");
            
-            uint256 deductAmount;
-
         if ( airlineCounter <= 4 ){
 
-            if(amount < adminCharge){
             airlines[account] = AirlineProfile({
                                                     isRegistered: true,
                                                     isAdmin: false
                                                 });
                         airlineCounter++;
-            } else {
-
-            require( balance[account] >=  amount , 'Insufficient Balance');
-            deductAmount = balance[account].sub(amount);
-            balance[account] = balance[account].sub(deductAmount);
-            contractOwner.transfer(deductAmount);
-            airlines[account] = AirlineProfile({
-                                                    isRegistered: true,
-                                                    isAdmin: true
-                                                });
-                          airlineCounter++;                      
-            }
         
         } else {
             
@@ -201,28 +185,26 @@ contract FlightSuretyData {
 
         if (airlineCalls.length >=  airlineHalfConsensus) {
 
-            if(amount < adminCharge){
             airlines[account] = AirlineProfile({
                                                     isRegistered: true,
                                                     isAdmin: false
                                                 });
-                       airlineCounter++;                         
-            } else {
-
-            require( balance[account] >=  amount , 'Insufficient Balance');
-            deductAmount = balance[account].sub(amount);
-            balance[account] = balance[account].sub(deductAmount);
-            contractOwner.transfer(deductAmount);
-            airlines[account] = AirlineProfile({
-                                                    isRegistered: true,
-                                                    isAdmin: true
-                                                });
-                         airlineCounter++;                       
-            }
+                       airlineCounter++;  
+                     airlineCalls = new address[](0);                       
                  }
              }        
     }
 
+    function becomeAdmin(uint256 amount) external {
+        require(airlines[msg.sender].isRegistered, "Airline should be register first to be an admin");
+        require(msg.value >= amount, "Insufficient balance");
+        require(amount >= adminCharge, "Please deposit minimum 10 ether to become an admin");
+        uint256 airlineWalletBalane = msg.value;
+        uint256 fundAmount = msg.value.sub(amount);
+        airlineWalletBalane = airlineWalletBalane.sub(fundAmount);
+        contractOwner.transfer(fundAmount);
+        airlines[msg.sender].isAdmin = true;
+    }
 
    /**
     * @dev Buy insurance for a flight
@@ -230,7 +212,7 @@ contract FlightSuretyData {
     */   
     function buy
                             ( 
-                                uint256 amount, bytes32 flight, address airline                            
+                                uint256 amount, bytes32 flight                           
                             ) 
                             external
                             payable
@@ -242,10 +224,10 @@ contract FlightSuretyData {
         uint256 passengerWalletBalance = msg.value;
         uint256 deductionAmount = passengerWalletBalance.sub(amount);
         passengerWalletBalance = passengerWalletBalance.sub(deductionAmount);
-        airline.transfer(deductionAmount);
+        contractOwner.transfer(deductionAmount);
         passengers[msg.sender] = PassengerInsuranceData({
                                       insuredFlight: flight,
-                                              isActive: true
+                                           isActive: true
                                                  });
 
     }

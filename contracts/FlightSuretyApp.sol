@@ -117,13 +117,12 @@ contract FlightSuretyApp {
 
     function registerAirline
                             (  
-                              address account,
-                              uint256 amount  
+                              address account 
                             )
                             external
                             returns(bool success, uint256 votes)
     {
-        flightSuretyData.registerAirline(account, amount);
+        flightSuretyData.registerAirline(account);
         return (success, 0);
     }
 
@@ -366,8 +365,7 @@ contract FlightSuretyApp {
 contract FlightSuretyData{
     function registerAirline
                             (  
-                                address account,
-                                uint256 amount
+                                address account
                             )
                             external
 }
