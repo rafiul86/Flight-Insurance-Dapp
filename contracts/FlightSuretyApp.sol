@@ -17,6 +17,7 @@ contract FlightSuretyApp {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
+    FlightSuretyData flightSuretyData;
     
     
     // Flight status codees
@@ -110,14 +111,19 @@ contract FlightSuretyApp {
    /**
     * @dev Add an airline to the registration queue
     *
-    */   
+    */  
+
+    
+
     function registerAirline
                             (  
-                                
+                              address account,
+                              uint256 amount  
                             )
                             external
                             returns(bool success, uint256 votes)
     {
+        flightSuretyData.registerAirline(account, amount);
         return (success, 0);
     }
 
@@ -357,7 +363,12 @@ contract FlightSuretyApp {
 }  
 
 contract FlightSuretyData{
-
+    function registerAirline
+                            (  
+                                address account,
+                                uint256 amount
+                            )
+                            external
 }
 
 
