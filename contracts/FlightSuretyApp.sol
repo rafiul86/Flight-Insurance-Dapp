@@ -163,7 +163,7 @@ contract FlightSuretyApp {
         
         require(airlines[msg.sender].isRegistered, "Caller is not authorized");
         bytes32 key = getFlightKey(airline, flight, timestamp);
-        require(flights[key].airline == msg.sender, "Caller is not owner of the flight");
+        require(flights[key].airline == msg.sender , "Caller is not owner of the flight");
         flights[key].statusCode = statusCode;
     }
 

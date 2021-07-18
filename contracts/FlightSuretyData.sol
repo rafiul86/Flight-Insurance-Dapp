@@ -29,15 +29,16 @@ contract FlightSuretyData {
     }
 
     mapping(address => AirlineProfile) airlines;
-    mapping(address => uint256) balance;
+    
+    
 
 
-    struct PassengerProfile {
-        bytes32 flight;
-        bool isInsuranceBought;
+    struct PassengerInsuranceData {
+           bytes32 insuredFlight;
+           bool isActive;
     }
-    mapping(address => PassengerProfile) passengers;
-
+    mapping(address => PassengerInsuranceData) passengers;
+    mapping(address => uint256) passengerInsuranceBalance;
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -235,14 +236,16 @@ contract FlightSuretyData {
                             payable
                             
     {
-        require(amount >= insurancePrice, 'Insufficient fund to but insurance');
-        require(balance[msg.sender] >= amount, 'Insufficient fund to but insurance');
-        uint256 deductionAmount = balance[msg.sender].sub(amount);
-        balance[msg.sender] = balance[msg.sender].sub(deductionAmount);
+        require(amount >= insurancePrice, 'Insufficient fund to buy insurance');
+        require(!passengers[msg.sender].isActive, "Passenger already bought an insurance");
+        require(msg.value >= amount, 'Insufficient fund to buy insurance');
+        uint256 passengerWalletBalance = msg.value;
+        uint256 deductionAmount = passengerWalletBalance.sub(amount);
+        passengerWalletBalance = passengerWalletBalance.sub(deductionAmount);
         airline.transfer(deductionAmount);
-        passengers[msg.sender] = PassengerProfile({
-                                                flight: flight,
-                                     isInsuranceBought: true
+        passengers[msg.sender] = PassengerInsuranceData({
+                                      insuredFlight: flight,
+                                              isActive: true
                                                  });
 
     }
@@ -252,18 +255,12 @@ contract FlightSuretyData {
     */
     function creditInsurees
                                 (
-                                    bytes32 cancelledFlight,
-                                    address account,
-                                    address airline
+                                    bytes32 cancelledFlight
                                 )
                                 external
                             
     {
-        require( cancelledFlight == passengers[account].flight , "Flight is ok");
-         uint256 insuranceReturn = insurancePrice.mul(2);  
-                 balance[airline] = balance[airline].sub(insuranceReturn);
-                 passengers[account].isInsuranceBought = false;
-                 balance[account].add(insuranceReturn);
+    
     }
     
 
@@ -280,9 +277,9 @@ contract FlightSuretyData {
                             
     {
             require(msg.sender == tx.origin, "Contracts are not allowed to withdraw funds");
-            require(balance[msg.sender] >= amount, 'Amount must be less than available balance');
-            uint256 withdrwableBalance = balance[msg.sender];
-                    balance[msg.sender] = balance[msg.sender].sub(withdrwableBalance);
+            require(passengerInsuranceBalance[msg.sender] >= amount, 'Amount must be less than available balance');
+            uint256 withdrwableBalance = passengerInsuranceBalance[msg.sender];
+                    passengerInsuranceBalance[msg.sender] = passengerInsuranceBalance[msg.sender].sub(withdrwableBalance);
                     msg.sender.transfer(withdrwableBalance);
     }
 
