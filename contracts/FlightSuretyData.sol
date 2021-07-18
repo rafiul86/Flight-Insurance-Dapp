@@ -123,11 +123,10 @@ contract FlightSuretyData {
     function setOperatingStatus(bool mode) external  {
         
         if(msg.sender == contractOwner){
-            require(mode != operational, "New mode must be different from existing mode");
+            
             operational = mode;
 
         } else {
-        require(mode != operational, "New mode must be different from existing mode");
         require(airlines[msg.sender].isAdmin, "Caller is not an admin");
 
         bool isDuplicate = false;
