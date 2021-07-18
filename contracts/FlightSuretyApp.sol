@@ -139,7 +139,8 @@ contract FlightSuretyApp {
                                 external
                             
     {
-        require(airlines[msg.sender].isAdmin, "Caller is not admin");
+        require(airlines[msg.sender].isRegistered, "Airline is not registered");
+
         bytes32 key = getFlightKey(airline, flight, timestamp);
 
         flights[key] = Flight({isRegistered: true, statusCode: 10, updatedTimestamp: timestamp, airline: msg.sender});
@@ -160,9 +161,9 @@ contract FlightSuretyApp {
                                 
     {   
         
-        require(airlines[msg.sender].isAdmin, "Caller is not admin");
+        require(airlines[msg.sender].isRegistered, "Caller is not authorized");
         bytes32 key = getFlightKey(airline, flight, timestamp);
-        require(flights[key].airline == msg.sender, "Caller is not admin");
+        require(flights[key].airline == msg.sender, "Caller is not owner of the flight");
         flights[key].statusCode = statusCode;
     }
 

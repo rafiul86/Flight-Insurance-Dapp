@@ -229,7 +229,7 @@ contract FlightSuretyData {
     */   
     function buy
                             ( 
-                                uint256 amount, bytes32 flight                            
+                                uint256 amount, bytes32 flight, address airline                            
                             ) 
                             external
                             payable
@@ -239,7 +239,7 @@ contract FlightSuretyData {
         require(balance[msg.sender] >= amount, 'Insufficient fund to but insurance');
         uint256 deductionAmount = balance[msg.sender].sub(amount);
         balance[msg.sender] = balance[msg.sender].sub(deductionAmount);
-        contractOwner.transfer(deductionAmount);
+        airline.transfer(deductionAmount);
         passengers[msg.sender] = PassengerProfile({
                                                 flight: flight,
                                      isInsuranceBought: true
@@ -253,14 +253,15 @@ contract FlightSuretyData {
     function creditInsurees
                                 (
                                     bytes32 cancelledFlight,
-                                    address account
+                                    address account,
+                                    address airline
                                 )
                                 external
                             
     {
         require( cancelledFlight == passengers[account].flight , "Flight is ok");
-         uint256 insuranceReturn =   insurancePrice.mul(2);  
-                 balance[contractOwner] = balance[contractOwner].sub(insuranceReturn);
+         uint256 insuranceReturn = insurancePrice.mul(2);  
+                 balance[airline] = balance[airline].sub(insuranceReturn);
                  passengers[account].isInsuranceBought = false;
                  balance[account].add(insuranceReturn);
     }
