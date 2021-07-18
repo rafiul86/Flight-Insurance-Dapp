@@ -29,7 +29,6 @@ contract FlightSuretyApp {
 
     address private contractOwner;          // Account used to deploy contract
 
-
     struct AirlineProfile{
        bool isRegistered;
        bool isAdmin;
@@ -114,16 +113,11 @@ contract FlightSuretyApp {
     */   
     function registerAirline
                             (  
-                                 address account
+                                
                             )
                             external
                             returns(bool success, uint256 votes)
     {
-        require(airlines[msg.sender].isAdmin, "Caller is not admin");
-        airlines[account] = AirlineProfile({
-                                                isRegistered: true,
-                                                isAdmin: false
-                                             });
         return (success, 0);
     }
 
@@ -361,5 +355,11 @@ contract FlightSuretyApp {
 // endregion
 
 }  
+
+contract FlightSuretyData{
+
+}
+
+
 
 
