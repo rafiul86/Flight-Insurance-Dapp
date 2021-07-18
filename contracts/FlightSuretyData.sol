@@ -28,9 +28,7 @@ contract FlightSuretyData {
        bool isAdmin;
     }
 
-    mapping(address => AirlineProfile) airlines;
-    mapping(address => uint256) airlineBalance;
-    
+    mapping(address => AirlineProfile) airlines; 
 
 
     struct PassengerInsuranceData {
