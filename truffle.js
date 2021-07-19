@@ -1,5 +1,5 @@
 var HDWalletProvider = require("truffle-hdwallet-provider");
-var mnemonic = "phone couple offer blade keen warfare bench next chief kiwi drum smooth";
+var mnemonic = "bulb neglect love spring luggage around dynamic unique scrub excess wolf energy";
 
 module.exports = {
   networks: {
