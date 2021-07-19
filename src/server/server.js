@@ -46,7 +46,7 @@ const submitOracleResponses = async (event) => {
         gas: 100000,
       });
     } catch (err) {
-      console.log('submit response error for oracle: ', oracle);
+      console.log('submit response error for oracle: ',+ oracle);
     }
   });
 };
@@ -84,4 +84,4 @@ app.get('/api', (req, res) => {
     })
 })
 registerOracles();
-export default app;
+export default app; 

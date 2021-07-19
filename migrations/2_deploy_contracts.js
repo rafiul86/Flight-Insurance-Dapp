@@ -7,7 +7,7 @@ module.exports = function(deployer) {
     let firstAirline = '0xDE739140132Fc806e7480dAD3C52C63DA1CCaDE2';
     deployer.deploy(FlightSuretyData)
     .then(() => {
-        return deployer.deploy(FlightSuretyApp)
+        return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
                 .then(() => {
                     let config = {
                         localhost: {

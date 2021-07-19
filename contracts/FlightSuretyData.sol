@@ -156,7 +156,7 @@ contract FlightSuretyData {
     *      Can only be called from FlightSuretyApp contract
     *
     */
-    function isAirline(address account) external view returns(bool){
+    function isAirlineAdmin(address account) external view returns(bool){
       return  airlines[account].isAdmin;
     }
 
@@ -172,8 +172,8 @@ contract FlightSuretyData {
         if( airlineCounter <= 4 ){
 
             airlines[account] = AirlineProfile({
-                                                    isRegistered: true,
-                                                    isAdmin: false
+                                                    isRegistered:true,
+                                                    isAdmin:false
                                                 });
                         airlineCounter++;
         
@@ -221,9 +221,9 @@ contract FlightSuretyData {
                             (
                                 uint256 amount, bytes32 flight
                             )
-                            external
+                            public
                             payable
-                            
+                            requireIsOperational
     {
         require(amount >= insurancePrice, 'Insufficient fund to buy insurance');
         require(!passengers[msg.sender].isActive, "Passenger already bought an insurance");
@@ -247,6 +247,7 @@ contract FlightSuretyData {
                                     bytes32 cancelledFlight, address passenger
                                 )
                                 external
+                                payable
                                 requireIsOperational
     {
         require(passengers[passenger].insuredFlight == cancelledFlight, "Flight status in not eligible for insurance payout");
@@ -286,11 +287,12 @@ contract FlightSuretyData {
     */
     function fund
                             (
+                                
                             )
                             public
                             payable
     {
-    
+        
     }
 
     function getFlightKey

@@ -19,7 +19,6 @@ contract FlightSuretyApp {
 
     FlightSuretyData flightSuretyData;
     
-    
     // Flight status codees
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
@@ -58,12 +57,7 @@ contract FlightSuretyApp {
     *      This is used on all state changing functions to pause the contract in
     *      the event there is an issue that needs to be fixed
     */
-    modifier requireIsOperational()
-    {
-         // Modify to call data contract's status
-        require(true, "Contract is currently not operational");
-        _;  // All modifiers require an "_" which indicates where the function body will be added
-    }
+   
 
     /**
     * @dev Modifier that requires the "ContractOwner" account to be the function caller
@@ -84,48 +78,60 @@ contract FlightSuretyApp {
     */
     constructor
                                 (
-                                    
+                                  address dataContract
                                 )
                                 public
     {
         contractOwner = msg.sender;
+        flightSuretyData = FlightSuretyData(dataContract);
     }
 
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
 
-    function isOperational()
-                            public
-                            pure
-                            returns(bool)
-    {
-        return true;  // Modify to call data contract's status
+    function isOperational () external view returns(bool) {
+        return flightSuretyData.isOperational();
     }
 
+    function isAirlineAdmin(address account) external view returns(bool){
+      return flightSuretyData.isAirlineAdmin(account);
+    }
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
 
-  
+    function setOperatingStatus(bool mode) external {
+        flightSuretyData.setOperatingStatus(mode, msg.sender);
+    }
+
+    function becomeAdmin(uint256 amount) external payable {
+        flightSuretyData.becomeAdmin(amount);
+    }
    /**
     * @dev Add an airline to the registration queue
     *
-    */  
+    */
 
     
 
-    function registerAirline
-                            (
-                              address account
-                            )
-                            external
-                            returns(bool success, uint256 votes)
-    {
-        flightSuretyData.registerAirline(account);
-        return (success, 0);
+    function registerAirline(address airline) external {
+        flightSuretyData.registerAirline(airline, msg.sender);
     }
 
+    function buy(uint256 amount, bytes32 flight) public payable{
+        flightSuretyData.buy.value(msg.value)(amount, flight);
+    }
+
+    function creditInsurees ( bytes32 cancelledFlight, address passenger ) external payable {
+        flightSuretyData.creditInsurees(cancelledFlight, passenger);
+    }
+
+    function pay ( uint256 amount) external {
+        flightSuretyData.pay(amount);
+    }
+
+  
 
    /**
     * @dev Register a future flight for insuring.
@@ -136,7 +142,6 @@ contract FlightSuretyApp {
                                   string flight, uint256 timestamp, address airline
                                 )
                                 external
-                            
     {
         require(airlines[msg.sender].isAdmin, "Airline is not an admin to flight register, plase fund 10 ether to become admin");
 
@@ -148,7 +153,7 @@ contract FlightSuretyApp {
    /**
     * @dev Called after oracle has updated flight status
     *
-    */  
+    */
     function processFlightStatus
                                 (
                                     address airline,
@@ -158,7 +163,7 @@ contract FlightSuretyApp {
                                 )
                                 internal
                                 
-    {   
+    {
         
         require(airlines[msg.sender].isAdmin, "Airline is not an admin to fetch flight status, plase fund 10 ether to become admin");
         bytes32 key = getFlightKey(airline, flight, timestamp);
@@ -363,12 +368,24 @@ contract FlightSuretyApp {
 }  
 
 contract FlightSuretyData{
-    function registerAirline
-                            (
-                                address account
-                            )
-                            external;
-}
+    function registerAirline(address account, address sender)external{}
+
+    function isOperational()public  view returns(bool){}
+
+    function setOperatingStatus(bool mode, address sender) external {}
+
+    function isAirlineAdmin(address account) external view returns(bool){}
+
+    function becomeAdmin(uint256 amount) external payable {}
+
+    function buy(uint256 amount, bytes32 flight) public payable{}
+
+      function creditInsurees ( bytes32 cancelledFlight, address passenger ) external payable {}
+
+      function pay ( uint256 amount) external {}
+
+      
+    }
 
 
 
