@@ -380,9 +380,9 @@ contract FlightSuretyData{
 
     function buy(uint256 amount, bytes32 flight) public payable{}
 
-      function creditInsurees ( bytes32 cancelledFlight, address passenger ) external payable {}
+    function creditInsurees ( bytes32 cancelledFlight, address passenger ) external payable {}
 
-      function pay ( uint256 amount) external {}
+    function pay ( uint256 amount) external {}
 
       
     }

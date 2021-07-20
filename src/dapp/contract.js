@@ -40,6 +40,13 @@ export default class Contract {
             .call({ from: self.owner}, callback);
     }
 
+    // isAirlineAdmin(callback){
+    //     let self = this;
+    //     self.flightSuretyApp.methods
+    //     .isAirlineAdmin()
+    //     .call({ from: self.owner}, callback)
+    // }
+
     fetchFlightStatus(flight, callback) {
         let self = this;
         let payload = {

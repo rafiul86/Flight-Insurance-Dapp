@@ -1,7 +1,7 @@
 
 var Test = require('../config/testConfig.js');
 var BigNumber = require('bignumber.js');
-
+var web3 = require('web3')
 contract('Flight Surety Tests', async (accounts) => {
 
   var config;
@@ -59,7 +59,7 @@ contract('Flight Surety Tests', async (accounts) => {
       let reverted = false;
       try 
       {
-          await config.flightSurety.setTestingMode(true);
+        await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
       }
       catch(e) {
           reverted = true;
@@ -90,5 +90,25 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
  
+//   it('(airline) deposit 10 ether to become admin', async () => {
+    
+    
+//     let admincharge = web3.utils.toWei("10", 'ether');
+//     const newAirline = "0x741c4F363D5cfad442CE2F7A1659F5cFa5EBA59C"
+//     await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
+//     await config.flightSuretyApp.becomeAdmin(admincharge, {from: newAirline});
 
+//     // ACT
+//     try {
+//         await config.flightSuretyApp.isAirlineAdmin(newAirline);
+//     }
+//     catch(e) {
+
+//     }
+//     let result = await config.flightSuretyApp.isAirlineAdmin(newAirline);
+
+//     // ASSERT
+//     assert.equal(result, true, "Airline now admin after depositing 10 ether");
+
+//   });
 });

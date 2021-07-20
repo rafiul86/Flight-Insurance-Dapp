@@ -4,7 +4,7 @@ const fs = require('fs');
 
 module.exports = function(deployer) {
 
-    let firstAirline = '0xDE739140132Fc806e7480dAD3C52C63DA1CCaDE2';
+    let firstAirline 
     deployer.deploy(FlightSuretyData)
     .then(() => {
         return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
@@ -14,7 +14,7 @@ module.exports = function(deployer) {
                             url: 'http://localhost:7545',
                             dataAddress: FlightSuretyData.address,
                             appAddress: FlightSuretyApp.address,
-                            firstAirline: firstAirline
+                            firstAirline: FlightSuretyData.address
                         }
                     }
                     fs.writeFileSync(__dirname + '/../src/dapp/config.json',JSON.stringify(config, null, '\t'), 'utf-8');

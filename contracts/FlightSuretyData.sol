@@ -167,6 +167,15 @@ contract FlightSuretyData {
                             external
                             requireIsOperational
     {
+         if( airlineCounter == 0 && msg.sender == contractOwner ){
+
+            airlines[account] = AirlineProfile({
+                                                    isRegistered:true,
+                                                    isAdmin:false
+                                                });
+                        airlineCounter++;
+        
+        }
         require(airlines[msg.sender].isAdmin, "Airline is not an admin to register new airline.");
            
         if( airlineCounter <= 4 ){
@@ -203,20 +212,21 @@ contract FlightSuretyData {
     }
 
     function becomeAdmin(uint256 amount) external payable requireIsOperational {
-        require(airlines[msg.sender].isRegistered, "Airline should be register first to be an admin");
-        require(msg.value >= amount, "Insufficient balance");
+        require(airlines[msg.sender].isRegistered == true, "Airline must register first to become admin");
+        require(msg.value >= amount, "Insufficient balance , please deposit");
         require(amount >= adminCharge, "Please deposit minimum 10 ether to become an admin");
         uint256 airlineWalletBalane = msg.value;
         uint256 fundAmount = msg.value.sub(amount);
         airlineWalletBalane = airlineWalletBalane.sub(fundAmount);
         address(this).transfer(fundAmount);
         airlines[msg.sender].isAdmin = true;
+        airlines[msg.sender].isRegistered = true;
     }
 
    /**
     * @dev Buy insurance for a flight
     *
-    */   
+    */
     function buy
                             (
                                 uint256 amount, bytes32 flight
