@@ -42,20 +42,6 @@ export default class Contract {
             .call({ from: self.owner}, callback);
     }
 
-    setOperatingStatus(mode, callback) {
-        
-        let self = this;
-        let address = self.flightSuretyData.address;
-        let payload = {
-            mode: mode
-        }
-       self.flightSuretyApp.methods
-       .setOperatingStatus(payload.mode)
-       .send({ from: address }, (error, result) => {
-        callback(error, payload);
-        });
-    }
-
     fetchFlightStatus(flight, callback) {
         let self = this;
         let payload = {
@@ -68,5 +54,31 @@ export default class Contract {
             .send({ from: self.owner}, (error, result) => {
                 callback(error, payload);
             });
+    }
+
+    setOperatingStatus(mode, callback) {
+        
+        let self = this;
+        let payload = {
+            mode: mode
+        }
+       self.flightSuretyApp.methods
+       .setOperatingStatus(payload.mode)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
+    }
+
+    registerAirline(airline, callback) {
+        
+        let self = this;
+        let payload = {
+            airline: airline
+        }
+       self.flightSuretyApp.methods
+       .registerAirline(payload.airline)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
     }
 }

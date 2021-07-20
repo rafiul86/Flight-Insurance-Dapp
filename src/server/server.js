@@ -13,14 +13,17 @@ let initialOracles = 20;
 let oracles = [];
 let accounts = [];
 
-const registerOracles = async () => {
+const registerOracles = async (callback) => {
  let accounts = await web3.eth.getAccounts();
   for(let i = 0; i < initialOracles ; i++) {
     await flightSuretyApp.methods.registerOracle.send({
       from: accounts[i],
       value: web3.utils.toWei('1', 'ether'),
       gas: 1000000,
-    });
+    },(callback)=>{
+      console.log(err)
+    })
+    
     let indexes = await flightSuretyApp.methods.getMyIndexes.call({
       from: accounts[i],
       gas: 100000,
@@ -29,7 +32,7 @@ const registerOracles = async () => {
       account: accounts[i],
       indexes,
     });
-    console.log('Oracle: ', i - 19, 'account: ', accounts[i], 'indexes: ', indexes);
+    console.log('Oracle: ', i , 'account: ', accounts[i], 'indexes: ', indexes);
   }
 };
 const submitOracleResponses = async (event) => {
@@ -59,7 +62,7 @@ const getOraclesIndex = (index) => {
       }
     })
   });
-  return oraclesIndex;
+  return oraclesIndex; 
 };
 flightSuretyApp.events.OracleRequest({
     fromBlock: 0

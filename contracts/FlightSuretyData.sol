@@ -212,7 +212,7 @@ contract FlightSuretyData {
     }
 
     function becomeAdmin(uint256 amount) external payable requireIsOperational {
-        require(airlines[msg.sender].isRegistered == true, "Airline must register first to become admin");
+        // require(airlines[msg.sender].isRegistered == true, "Airline must register first to become admin");
         require(msg.value >= amount, "Insufficient balance , please deposit");
         require(amount >= adminCharge, "Please deposit minimum 10 ether to become an admin");
         uint256 airlineWalletBalane = msg.value;

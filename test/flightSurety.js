@@ -90,25 +90,25 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
  
-//   it('(airline) deposit 10 ether to become admin', async () => {
+  it('(airline) deposit 10 ether to become admin', async () => {
     
     
-//     let admincharge = web3.utils.toWei("10", 'ether');
-//     const newAirline = "0x741c4F363D5cfad442CE2F7A1659F5cFa5EBA59C"
-//     await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
-//     await config.flightSuretyApp.becomeAdmin(admincharge, {from: newAirline});
+    let admincharge = "1000000000000000000"
+    const newAirline = "0x78a865D931d29998458c03Cf336Ff044Ae338f71"
+    await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
+    await config.flightSuretyApp.becomeAdmin(admincharge, {from: newAirline});
 
-//     // ACT
-//     try {
-//         await config.flightSuretyApp.isAirlineAdmin(newAirline);
-//     }
-//     catch(e) {
+    // ACT
+    try {
+        await config.flightSuretyApp.isAirlineAdmin(newAirline);
+    }
+    catch(e) {
 
-//     }
-//     let result = await config.flightSuretyApp.isAirlineAdmin(newAirline);
+    }
+    let result = await config.flightSuretyApp.isAirlineAdmin(newAirline);
 
-//     // ASSERT
-//     assert.equal(result, true, "Airline now admin after depositing 10 ether");
+    // ASSERT
+    assert.equal(result, true, "Airline now admin after depositing 10 ether");
 
-//   });
+  });
 });
