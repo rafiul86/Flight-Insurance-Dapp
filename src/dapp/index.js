@@ -75,11 +75,21 @@ import './flightsurety.css';
             });
         })
 
-        DOM.elid('submit-status').addEventListener('click', () => {
-            let statusquery = DOM.elid('flight-status').value;
+        DOM.elid('submit-refund').addEventListener('click', () => {
+            let flight = DOM.elid('flight-refund').value;
+            let address = DOM.elid('flight-address').value;
             // Write transaction
-            contract.becomeAdmin(statusquery, (error, result) => {
-                 alert(statusquery +"  "+ "flight status fetched successfully")
+            contract.creditInsurees(flight, address, (error, result) => {
+                 alert(address +"  "+ "is refunded successfully")
+               
+            });
+        })
+
+        DOM.elid('submit-withdraw').addEventListener('click', () => {
+            // Write transaction
+            let amount = DOM.elid('flight-withdraw').value;
+            contract.pay(amount, (error, result) => {
+                 alert("Your account is credited successfully by" + amount)
                
             });
         })

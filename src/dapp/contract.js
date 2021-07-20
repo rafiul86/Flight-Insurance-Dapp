@@ -119,13 +119,26 @@ export default class Contract {
         });
     }
 
-    processFlightStatus(statusquery, callback) {
+    creditInsurees(flight, address, callback) {
         let self = this;
         let payload = {
-            statusquery: statusquery
+            flight: flight,
+            address: address
         }
        self.flightSuretyApp.methods
-       .processFlightStatus(payload.statusquery)
+       .creditInsurees(payload.flight, payload.address)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
+    }
+
+    pay(amount, callback) {
+        let self = this;
+        let payload = {
+           amount: amount
+        }
+       self.flightSuretyApp.methods
+       .creditInsurees(payload.amount)
        .send({ from: self.owner}, (error, result) => {
         callback(error, payload);
         });
