@@ -106,4 +106,28 @@ export default class Contract {
         callback(error, payload);
         });
     }
+
+    processFlightStatus(statusquery, callback) {
+        let self = this;
+        let payload = {
+            statusquery: statusquery
+        }
+       self.flightSuretyApp.methods
+       .processFlightStatus(payload.statusquery)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
+    }
+
+    processFlightStatus(statusquery, callback) {
+        let self = this;
+        let payload = {
+            statusquery: statusquery
+        }
+       self.flightSuretyApp.methods
+       .processFlightStatus(payload.statusquery)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
+    }
 }

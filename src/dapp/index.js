@@ -75,6 +75,15 @@ import './flightsurety.css';
             });
         })
 
+        DOM.elid('submit-status').addEventListener('click', () => {
+            let statusquery = DOM.elid('flight-status').value;
+            // Write transaction
+            contract.becomeAdmin(statusquery, (error, result) => {
+                 alert(statusquery +"  "+ "flight status fetched successfully")
+               
+            });
+        })
+
     });
     
 
