@@ -56,7 +56,25 @@ import './flightsurety.css';
             });
         })
     
-    
+        DOM.elid('submit-select').addEventListener('click', () => {
+            let amount = DOM.elid('flight-insurance').value;
+            let flight = DOM.elid('flight-select').value;
+            // Write transaction
+            contract.buy(amount, flight, (error, result) => {
+                 alert(flight +"  "+"Insurance bought successfully")
+               
+            });
+        })
+
+        DOM.elid('submit-status').addEventListener('click', () => {
+            let statusquery = DOM.elid('flight-status').value;
+            // Write transaction
+            contract.becomeAdmin(statusquery, (error, result) => {
+                 alert(statusquery +"  "+ "flight status fetched successfully")
+               
+            });
+        })
+
     });
     
 

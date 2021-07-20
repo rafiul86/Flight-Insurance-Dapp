@@ -93,4 +93,17 @@ export default class Contract {
         callback(error, payload);
         });
     }
+
+    buy(flight,amount, callback) {
+        let self = this;
+        let payload = {
+            amount: amount,
+            flight: flight
+        }
+       self.flightSuretyApp.methods
+       .buy(payload.amount, payload.flight)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
+    }
 }
