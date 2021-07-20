@@ -85,7 +85,7 @@ flightSuretyApp.events.OracleRequest({
     }
     catch(e) {
       // Enable this when debugging
-       console.log('\nError en el Submit Oracle', index, index, event.returnValues.flight, event.returnValues.timestamp, e); //oracleIndexes[idx].toNumber()
+       console.log('\if error occur', index, index, event.returnValues.flight, event.returnValues.timestamp, e); //oracleIndexes[idx].toNumber()
     }
 
   //}
