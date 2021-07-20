@@ -81,4 +81,16 @@ export default class Contract {
         callback(error, payload);
         });
     }
+
+    becomeAdmin(amount, callback) {
+        let self = this;
+        let payload = {
+            amount: amount
+        }
+       self.flightSuretyApp.methods
+       .becomeAdmin(payload.amount)
+       .send({ from: self.owner}, (error, result) => {
+        callback(error, payload);
+        });
+    }
 }

@@ -48,10 +48,10 @@ import './flightsurety.css';
         })
 
         DOM.elid('submit-fund').addEventListener('click', () => {
-            let airline = DOM.elid('flight-fund').value;
+            let amount = DOM.elid('flight-fund').value;
             // Write transaction
-            contract.registerAirline(airline, (error, result) => {
-                 alert(airline +"  "+ "registered successfully")
+            contract.becomeAdmin(amount, (error, result) => {
+                 alert(amount +"  ether" +"  "+ "deposited successfully, you are now an Admin")
                
             });
         })
